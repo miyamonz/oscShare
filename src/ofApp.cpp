@@ -75,16 +75,23 @@ void ofApp::update(){
         }else{
             //senderMe.sendMessage(m);
             //loggers[0].setLog(m);
-            for(int i=0; i<connected; i++)
+            for(int i=0; i<connected; i++) {
                 laterSender[i].sendMessageAll(m);
+            }
         }
     }
     for(int i=0; i<receiver.size(); i++){
         while(receiver[i].hasWaitingMessages()){
             ofxOscMessage m;
             receiver[i].getNextMessage(m);
+            if(sendOneMode ){
+                if(sendIndex<connected){
+                    laterSender[sendIndex].getSender(i).sendMessage(m);
+                }
+            }else{
             for(int j=0; j<connected; j++)
                 laterSender[j].getSender(i).sendMessage(m);
+            }
         }
     }
     
@@ -143,6 +150,13 @@ void ofApp::draw(){
     
     ofDrawBitmapStringHighlight(ofToString(portList[logNum]+1), 400, 20);
     loggers[logNum].drawLog(400, 40);
+    
+    if(sendOneMode){
+        height+=5;
+        ofSetColor(ofColor::red);
+        ofDrawCircle(20,195 + sendIndex*21,10);
+        ofDrawBitmapStringHighlight("send one mode", 30, height += 20);
+    }
 }
 
 //--------------------------------------------------------------
@@ -170,7 +184,17 @@ void ofApp::keyPressed(int key){
         if(logNum == portList.size()-1) return;
         logNum++;
     }
-    
+    if(key == 'o'){
+        sendOneMode = !sendOneMode;
+    }
+    if(key == OF_KEY_UP) {
+        if(sendIndex == 0) return;
+        sendIndex--;
+    }
+    if(key == OF_KEY_DOWN) {
+        if(logNum >= connected-1) return;
+        sendIndex++;
+    }
 }
 
 //--------------------------------------------------------------

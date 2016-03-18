@@ -41,4 +41,7 @@ class ofApp : public ofBaseApp{
     vector<Logger> loggers;
     int logNum=0;
     
+    
+    bool sendOneMode = false;
+    int sendIndex = 0;
 };
